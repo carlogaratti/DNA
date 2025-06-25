@@ -12,7 +12,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public class JAvaClip extends Receiver{
 	
 	Clip clip = null;
-	
 	String _loopCount;
 	
 	public void loopCount(String aLoopCount) {
