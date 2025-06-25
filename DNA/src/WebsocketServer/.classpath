@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/javax.servlet-api-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/jetty-http-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/jetty-io-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/jetty-security-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/jetty-server-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/jetty-servlet-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/jetty-util-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/websocket-api-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/websocket-client-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/websocket-common-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/websocket-server-9.2.17.v20160517.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-9.2/websocket-servlet-9.2.17.v20160517.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Workshop Health"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

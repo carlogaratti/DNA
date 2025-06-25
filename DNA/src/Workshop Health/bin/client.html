@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="UTF-8">
+  <head>
+    <title>Recipe</title>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin,latin-ext,vietnamese" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,700&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin,latin-ext,vietnamese" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  
+	<style>
+		/*
+		 * Gli internal ed external styles sheets non sono accessibili tramite la proprieta "element.style"
+		 * e risulta complicato accedervi in una maniera cross-browser.
+		 * Ho seguito queste regole:
+		 * 1. i valori a cui dobbiamo accedere li teniamo inline
+		 * 2. i valori a cui non dobbiamo accedere li teniamo internal o external
+	 	 * 
+		 */
+		 
+		 /*
+		  * note le altezze sono messe a manina, non ho capito ancora come si gestiscono
+		  * note questo commento e' rilevante: http://stackoverflow.com/a/17687595
+		  */
+   	   .workbenchPanel {
+   	   /*
+	    	width: 100%;
+		    height:100%;
+		    */
+		    
+	    	border-style: solid;
+    		border-width: 1px;
+    		border-color: blue;
+	    }
+	    .outerContainerStyle {
+			/*
+			fill: #ffd700;
+			fill: transparent;
+			*/
+			//fill: #ffffff;
+	    }
+	    .innerContainerStyle {
+			/*
+			fill: #ff0000;
+			*/
+			//fill: #ffffff;
+	    }
+		.textStyle {
+			fill: #000000;
+			font-family:"Roboto Condensed", arial, sans-serif;
+			font-size:11px;
+//			font-weight:bold;
+			/*
+			dominant-baseline: middle;
+			*/
+		}
+	</style>
+</head>
+	
+<body style="background-color:#E8E8E8">
+
+	<div class="container-fluid">
+
+		<!-- ///// TASK workbench-->
+		
+		<div class="row">
+			<div id="workbenchPanel" class="col-xs-12"></div>
+		</div>
+		
+		<!-- ///// -->
+		
+	</div>
+	
+	<script  src="fields.js"/></script>
+	<script>
+	
+		var cardRepository = {};
+		var incomingMessageHandlers = [];
+		
+	
+		
+		
+		var board = createBoard();
+		board.dimension = {width:1300, height:1500};
+ 		layoutBoard(board);
+ 		drawBoard(board);
+ 		
+ 		var dropShadowFilter = crateDropshadowFilter('dropshadow');
+ 		var filter = assembleFilter(dropShadowFilter);
+ 		installFilter(board,filter);
+ 		
+ 		
+ 		
+ 		// TASK CREA CARTE STANDARD
+ 		
+ 		var card1 = createCard('console');
+
+ 		cardRepository[card1.name] = card1;
+ 		card1.text = 'Console';
+
+ 		card1.coordinates = {x:80, y:40, width:240, height:120};		
+ 		assembleCard(card1);
+ 		layoutCard(card1);
+ 		drawCard(board, card1);
+ 		updateCardFilter(card1); // update
+ 		updateCardBackGroundColor(card1);
+ 		updateCardFontSize(card1);
+		updateCardText(card1);
+ 		incomingMessageHandlers.push(function(text) { 
+ 			if(!isTextFor(text, card1.name)) return; 
+ 			card1.text = "Received: " +extractMessageFrom(text); 
+ 			updateCardText(card1);
+ 			});
+ 		
+ 		
+ 		var card2 = createCard('repository');
+ 		cardRepository[card2.name] = card2;
+ 		card2.coordinates = {x:80, y:40, width:440, height:120};
+ 		card2.text = 'Card Repository';
+ 		assembleCard(card2);
+ 		layoutCard(card2);
+ 		drawCard(board,card2);
+ 		updateCardFilter(card2);
+ 		updateCardBackGroundColor(card2);
+		updateCardText(card2);
+
+		
+ 		var card3 = createCard('connections');
+ 		cardRepository[card3.name] = card3;
+ 		card3.coordinates = {x:160, y:70, width:240, height:120};
+ 		card3.text = 'Report Connections on Server';
+ 		assembleCard(card3);
+ 		layoutCard(card3);
+ 		drawCard(board,card3);
+ 		updateCardFilter(card3);
+ 		updateCardBackGroundColor(card3);
+ 		updateCardText(card3);
+		onMouseClickSendRequest(card3, "connections: report connections");
+ 		incomingMessageHandlers.push(function(text) { 
+ 			if(!isTextFor(text, card3.name)) return;  
+ 			card3.text = "Report Connections on Server. Received: " + extractMessageFrom(text);
+ 			updateCardText(card3); 
+ 			});
+ 		
+ 		
+ 		var card4 = createCard('command1');
+ 		cardRepository[card4.name] = card4;
+ 		card4.coordinates = {x:160, y:70, width:240, height:120};
+ 		card4.text = 'Add Fridge';
+ 		assembleCard(card4);
+ 		layoutCard(card4);
+ 		drawCard(board,card4);
+ 		updateCardFilter(card4);
+ 		updateCardBackGroundColor(card4);
+ 		updateCardText(card4);
+ 		onMouseClickSendRequest(card4, "command1: setup");
+ 		incomingMessageHandlers.push(function(text) { 
+ 			if(!isTextFor(text, card4.name)) return;  
+ 			card4.text = "Setup: Received: " + extractMessageFrom(text);
+ 			updateCardText(card4); 
+ 			});
+ 		
+ 		
+ 		
+ 		incomingMessageHandlers.push(function(text) { 
+ 			if(!isTextFor(text, 'newCard')) return; 
+ 			
+ 			card1.text = "Received: " +text; 
+ 			updateCardText(card1);
+ 			
+	
+ 			var message = extractMessageFrom(text);
+ 			var array = message.split("|");
+ 			var name = array[0].split("=")[1];
+ 			var content = array[1].split("=")[1];
+ 		
+
+ 			var newCard = createCard(name);
+ 	 		cardRepository[newCard.name] = newCard;
+ 	 		newCard.text = content;
+ 	 		newCard.coordinates = {x:80, y:240, width:240, height:120};		
+ 	 		assembleCard(newCard);
+ 	 		layoutCard(newCard);
+ 	 		drawCard(board, newCard);
+ 	 		updateCardFilter(newCard); // update
+ 	 		updateCardBackGroundColor(newCard);
+ 	 		updateCardFontSize(newCard);
+ 			updateCardText(newCard);
+ 	 		
+ 	 		snakeLayout(board, cardRepository);
+ 			});
+		
+ 		
+		incomingMessageHandlers.push(function(text) { 
+			var date = new Date();
+ 			card1.text = "Received("+ date + "): " + text.substring(0,30); 
+ 			updateCardText(card1);
+ 			});
+		
+		incomingMessageHandlers.push(function(text) { 
+			console.log(text);
+ 			});
+		
+		incomingMessageHandlers.push(function(text) { 
+			var sb = "";
+			var date = new Date();
+			sb += date;
+			var keys = Object.keys(cardRepository);
+			sb += "Handler Length = "+ incomingMessageHandlers.length;
+			sb += "Card Length = "+ keys.length;
+
+			for (var i in keys) {
+				sb += keys[i];
+				sb += ",";				
+			}
+ 			card2.text = sb; 
+ 			updateCardText(card2);
+ 			});
+ 		
+ 		snakeLayout(board, cardRepository);
+ 		var websocket = openConnection("ws://localhost:8080");
+		//var websocket = openConnection("ws://echo.websocket.org");
+		websocket.onmessage = onMessageDo(incomingMessageHandlers);
+		
+		
+		
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		function createBoard() {
+			var board = {};
+			board.canvas =  createCanvas();
+			board.dimension = {width:900, height:900};
+			return board;
+		}
+		
+		function layoutBoard(board) {
+			var width = Number(board.dimension.width);
+			var height = Number(board.dimension.height);
+			
+			updateBoardDimension(board, width, height);
+		}
+		
+		function updateBoardDimension(board, width, height) {
+			board.canvas.setAttribute('width',width);
+			board.canvas.setAttribute('height',height);
+		}
+		
+		function drawBoard(board) {
+			document.getElementById('workbenchPanel').appendChild(board.canvas);
+		}
+		
+		function crateDropshadowFilter(aName) {
+			var dropShadowFilter = {name: aName};
+			
+			var filters = [];
+			filters.push(createOffsetFilter('SourceAlpha', '0', '2','shadow1'));
+			filters.push(createColorMatrixFilter('shadow1', '.14','shadow1'));
+			filters.push(createGaussianBlurFilter('shadow1', '1','shadow1'));
+			filters.push(createOffsetFilter('SourceAlpha', '0', '1','shadow2'));
+			filters.push(createColorMatrixFilter('shadow2', '.25','shadow2'));
+			filters.push(createGaussianBlurFilter('shadow2', '1','shadow2'));
+			filters.push(createsMergeFilter(['shadow1', 'shadow2', 'SourceGraphic']));
+			
+			dropShadowFilter.filters = filters;
+			
+			return dropShadowFilter;
+		}
+		
+		function assembleFilter(filter) {
+			var result = createFilter(filter.name);
+			
+			for (i = 0; i < filter.filters.length; i++) {
+				result.appendChild(filter.filters[i]);
+			}
+			
+			return result;
+		}
+		
+		function installFilter(board, filter) {
+			board.canvas.appendChild(filter);
+		}
+		
+		function createCard(aName) {
+			var card = {};
+			card.name = aName;
+			card.coordinates = {x:10, y:10, width:240, height:120};
+			card.filter = 'dropshadow';
+			card.text = aName;
+			card.backgroundColor = '#FFFFFF';
+
+			// creo la struttura
+			var uiParts = {};
+			uiParts.outerContainer = createRect();
+			uiParts.innerContainer = createRect();
+			uiParts.linesContainer = createLinesContainer('textStyle');
+			uiParts.lines = [];
+			
+			card.uiParts = uiParts;
+			
+			return card;
+		}
+		
+		function assembleCard(card) {
+			var uiContainer = createCardView();
+			
+			uiContainer.appendChild(card.uiParts.outerContainer);
+			uiContainer.appendChild(card.uiParts.innerContainer);
+			uiContainer.appendChild(card.uiParts.linesContainer);
+			
+			card.uiContainer = uiContainer;
+		}
+		
+		function layoutCard(card) {
+			var x = Number(card.coordinates.x);
+			var y = Number(card.coordinates.y);
+			var width = Number(card.coordinates.width);
+			var height = Number(card.coordinates.height);
+			
+			updateCardPosition(card, x, y);
+			updateCardDimension(card, width, height);
+		}
+		
+		function updateCardPosition(card, x, y) {
+		    card.uiParts.outerContainer.setAttribute('x',x);
+		    card.uiParts.outerContainer.setAttribute('y',y);
+		    
+		    card.uiParts.innerContainer.setAttribute('x',x + 10);
+		    card.uiParts.innerContainer.setAttribute('y',y + 10);
+		    
+		    card.uiParts.linesContainer.setAttribute('x',x + 10);
+		    card.uiParts.linesContainer.setAttribute('y',y + 10);
+		    
+		    for (i = 0; i < card.uiParts.lines.length; i++) {
+		    	card.uiParts.lines[i].setAttribute('x', x + 10);
+		    }
+		}
+		
+		function updateCardDimension(card, width, height) {
+		    card.uiParts.outerContainer.setAttribute('width',width);
+		    card.uiParts.outerContainer.setAttribute('height',height);
+		    
+		    card.uiParts.innerContainer.setAttribute('width',width - 20);
+		    card.uiParts.innerContainer.setAttribute('height', height - 20);
+		    
+		    card.uiParts.linesContainer.setAttribute('width',width - 20);
+		    card.uiParts.linesContainer.setAttribute('height',height - 20);
+		}
+		
+		function updateCardFilter(card) {
+			card.uiParts.outerContainer.setAttribute('filter', 'url(#' + card.filter + ')');
+		}
+		
+		function updateCardBackGroundColor(card) {
+			card.uiParts.outerContainer.style.fill = card.backgroundColor;
+			card.uiParts.innerContainer.style.fill = card.backgroundColor;
+		}
+		
+		// al momento non funziona... dobbiamo trovare un modo per cambiare il font delle sole linee
+		function updateCardFontSize(card) {
+			card.uiParts.innerContainer.style.font.size = '10';
+		}
+		
+		function drawCard(board, card) {
+			board.canvas.appendChild(card.uiContainer);
+		}
+		
+		function undrawCard(board, card) {
+			board.canvas.removeChild(card.uiContainer);
+		}
+		
+		function createCanvas() {
+			var canvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			canvas.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+			canvas.setAttribute('xmlns:html', 'http://www.w3.org/1999/xhtml');
+			canvas.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+			canvas.setAttribute('version', '1.1');
+			canvas.setAttribute('class', 'workbenchPanel');
+			return canvas;
+		}
+		
+		function createFilter(id) {
+			var filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+			filter.setAttribute('id', id);
+			return filter;
+		}
+		
+		
+		function createCardView() {
+			// note il tag svg <g> permette di applicare operazioni a tutti i suoi figli
+			// note ad esempio se sposto un gruppo di 10 pixel tutti i suoi figli si spostano di 10 pixel
+			// note i figli di <g> hanno un sistema di coordinate relativo a quello di <g>
+
+			return document.createElementNS("http://www.w3.org/2000/svg", "g");
+		}
+		
+		function createRect() {
+			var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+			rect.setAttribute("rx", 2);
+			rect.setAttribute("ry", 2);
+			return rect;
+		}
+		
+		function createLinesContainer(cssClass) {
+			var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			text.setAttribute("class", cssClass);
+			return text;
+		}
+		
+		function createLine( x, dy) {
+			var line = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+			line.setAttribute("x", x); 
+			line.setAttribute("dy", dy); 
+ 			return line;
+		}
+		
+		function createOffsetFilter(input, dx, dy, result) {
+			var offset = document.createElementNS('http://www.w3.org/2000/svg', 'feOffset');
+			offset.setAttribute("in", input); 
+			offset.setAttribute("dx", dx); 
+			offset.setAttribute("dy", dy); 
+			offset.setAttribute("result", result); 
+			return offset;
+		}
+		
+		function createColorMatrixFilter(input, alpha, result) {
+			var colorMatrix = document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix');
+			colorMatrix.setAttribute('in', input); 
+			colorMatrix.setAttribute('values', '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ' + alpha + ' 0'); 
+			colorMatrix.setAttribute('result', result); 
+			return colorMatrix;
+		}
+		
+		function createGaussianBlurFilter(input, stdDeviation, result) {
+			var gaussianBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
+			gaussianBlur.setAttribute('in', input); 
+			gaussianBlur.setAttribute('stdDeviation', stdDeviation); 
+			gaussianBlur.setAttribute('result', result); 
+			return gaussianBlur;
+		}
+		
+		function createsMergeFilter(names) {
+			var merge = document.createElementNS('http://www.w3.org/2000/svg', 'feMerge');
+			for (i=0; i<names.length; i++) {
+				var mergeNode = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
+				mergeNode.setAttribute('in', names[i]);
+				merge.appendChild(mergeNode);
+				
+			}
+			return merge;
+		}
+		
+		function onMouseClickPrintOnConsole(card, text) {
+			card.uiContainer.addEventListener("click", function() { printOnConsole(text) });
+		}
+		
+		function onMouseClickPrintOnCard(card, text) {
+			card.uiContainer.addEventListener("click", function() { card.text = text; updateCardText(card) });
+		}
+		
+		function onMouseClickSendRequest(card, request) {
+			card.uiContainer.addEventListener("click", function() { websocket.send(request) });
+		}
+		
+		function  printOnConsole (text) { 
+			 console.log(text) ;
+		}
+		
+		function updateCardText(card) {
+			removeCardTextLines(card);
+			addCardTextLinesWrapped(card);
+			var removedLines = removeCardTextLinesExceedingVerticalBound(card);
+			if (removedLines.length > 0) {
+				addDotsToLastLine(card);
+			}
+		}
+		
+		function removeCardTextLines(card) {
+			for(var i=card.uiParts.lines.length; i>0; i--) {
+				var line = card.uiParts.lines.pop();
+				card.uiParts.linesContainer.removeChild(line);
+			}
+		}
+		
+		function addCardTextLinesWrapped(card) {
+			var maxWidth = card.uiParts.linesContainer.getAttribute('width');
+			var x = card.uiParts.linesContainer.getAttribute('x');
+			var dy = 17; 	 // font? 
+			
+			var line = createLine(x, dy);
+			card.uiParts.lines.push(line);
+			card.uiParts.linesContainer.appendChild(line);
+			
+			for (i = 0; i < card.text.length; i++) {
+				line.textContent += card.text[i];
+			
+				if (line.getComputedTextLength() > maxWidth) {
+					var wrapPoint = line.textContent.lastIndexOf(' ',  line.textContent.length - 2);
+					
+					var fittingText;
+					var exceedingText;
+					
+					if (wrapPoint == -1) {
+						fittingText = line.textContent.slice(0, -1);
+						exceedingText = line.textContent.slice(-1);
+					}
+						
+					if (wrapPoint != -1) {
+						fittingText = line.textContent.slice(0, wrapPoint + 1);
+						exceedingText = line.textContent.slice(wrapPoint + 1);
+					}
+					
+					line.textContent = fittingText;
+					
+					line =  createLine(x, dy);
+					line.textContent = exceedingText;
+					card.uiParts.lines.push(line);
+					card.uiParts.linesContainer.appendChild(line);
+				}
+			}
+			
+		}
+		
+		function removeCardTextLinesExceedingVerticalBound(card) {
+			var removedLines = [];
+		    var bottom = Number(card.uiParts.linesContainer.getAttribute('y')) + Number(card.uiParts.linesContainer.getAttribute('height'));
+		    
+		    for(i=card.uiParts.lines.length; i>0; i--) {
+			    var lastLine = 	card.uiParts.lines[i - 1];
+				var lastLineBottom = lastLine.getExtentOfChar(0).y + lastLine.getExtentOfChar(0).height;
+		    	
+				if (lastLineBottom <= bottom) break;
+				
+				removedLines.push(card.uiParts.lines.pop());
+				card.uiParts.linesContainer.removeChild(lastLine);
+			}
+		    
+		    return removedLines;
+		}
+		
+		function addDotsToLastLine(card) {
+			var maxWidht = card.uiParts.linesContainer.getAttribute('width')
+			var lastLine = card.uiParts.lines[card.uiParts.lines.length - 1];
+			
+			
+			var wrapPoint = lastLine.textContent.lastIndexOf(' ');
+			if (wrapPoint == -1) {
+				line.textContent = '...';
+				return;
+			}
+			
+			lastLine.textContent = lastLine.textContent.substring(0, wrapPoint) + '...';
+			while (lastLine.getComputedTextLength() > maxWidht) {
+				wrapPoint = lastLine.textContent.lastIndexOf(' ');
+				lastLine.textContent = lastLine.textContent.substring(0, wrapPoint) + '...';
+			}
+		}
+		
+		function snakeLayout(board, cards) {
+			// note si parte dal presupposto che tutte le carte abbiano lea stessa altezza
+			
+			var maxX = Number(board.dimension.width) - 10;
+			var xPadding = 10;
+			var yPadding = 10;
+			
+			var x = xPadding;
+			var y = yPadding;
+			
+			for (var i in cards) {
+				if (x + cards[i].coordinates.width >= maxX) {
+					x = xPadding;
+					y = y + yPadding + cards[i].coordinates.height;
+				}
+				
+				cards[i].coordinates = {x:x, y:y, width:cards[i].coordinates.width, height:cards[i].coordinates.height};
+				layoutCard(cards[i]);
+				
+				x = x + xPadding + cards[i].coordinates.width
+			}
+		}
+		
+		function openConnection (url) {
+			var ws = new WebSocket(url);
+			ws.onopen =  function() { console.log("open") };
+			ws.onclose = function() { console.log("close") };
+			ws.onmessage = function() { console.log("message") };
+			ws.onerror = function() { console.log("error") };
+			return ws;
+		}
+		
+		function onMessageDo(incomingMessageHandlers) {
+			return function(evt) {
+				for (var i = 0;  i < incomingMessageHandlers.length;  i++) {
+					incomingMessageHandlers[i](evt.data);
+				}
+			}
+		}
+		
+		function isTextFor(text, name){
+			if(text.startsWith(name)) return true;
+			return false
+		}
+		
+		function extractMessageFrom(text) {
+			var messagePos = text.indexOf(":");
+			return text.substring(messagePos+1);
+		}
+		
+			
+	</script>
+	
+</body>
+</html>
